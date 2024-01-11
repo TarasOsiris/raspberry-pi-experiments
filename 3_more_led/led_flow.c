@@ -2,20 +2,15 @@
 #include <stdio.h>
 #include <pigpio.h>
 #include <time.h>
+#include <bits/time.h>
 
 #define ledCounts 10
-int pins[ledCounts] = {};
+int pins[ledCounts] = {17, 18, 27, 22, 23, 24, 25, 2, 3, 8};
 
 volatile sig_atomic_t signal_received = 0;
 
 void sigint_handler(int signal) {
 	signal_received = signal;
-}
-
-unsigned int millis () {
-  struct timespec t ;
-  clock_gettime ( CLOCK_MONOTONIC_RAW , & t ) ; // change CLOCK_MONOTONIC_RAW to CLOCK_MONOTONIC on non linux computers
-  return t.tv_sec * 1000 + ( t.tv_nsec + 500000 ) / 1000000 ;
 }
 
 int main() {
@@ -26,7 +21,26 @@ int main() {
 	printf("Press CTRL-C to exit.\n");
 	signal(SIGINT, sigint_handler);
 
+	for (int i = 0; i < ledCounts; i++) {
+		gpioSetMode(i, PI_OUTPUT);
+	}
+
 	while (!signal_received) {
+		for (int i = 0; i < ledCounts; i++) {
+			gpioWrite(pins[i], PI_LOW);
+			// printf("hi\n");
+			time_sleep(0.1);
+			gpioWrite(pins[i], PI_HIGH);
+			// printf("lo\n");
+		}
+
+		for (int i = ledCounts; i >= 0; i--) {
+			gpioWrite(pins[i], PI_LOW);
+			// printf("hi\n");
+			time_sleep(0.1);
+			gpioWrite(pins[i], PI_HIGH);
+			// printf("lo\n");
+		}
 	}
 
 	gpioTerminate();
