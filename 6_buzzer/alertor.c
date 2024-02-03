@@ -20,18 +20,15 @@ void alertor(int pin) {
     int x;
     double sinVal, toneVal;
 
-		gpioPWM(buzzerPin, 128);
-        gpioSetPWMfrequency(buzzerPin, 2000);
-         gpioSleep(PI_TIME_RELATIVE, 1, 0);
-
-
-    // for (x = 0; x < 360; x++) {
-    //     sinVal = sin(x * (M_PI / 180));
-    //     toneVal = 2000 + sinVal * 500;
-	// 	gpioPWM(buzzerPin, 128);
-    //     gpioSetPWMfrequency(buzzerPin, toneVal);
-    //     gpioSleep(PI_TIME_RELATIVE, 1, 0);
-    // }
+//	gpioPWM(buzzerPin, 128);
+	
+     for (x = 0; x < 360; x++) {
+         sinVal = sin(x * (M_PI / 180));
+         toneVal = 2000 + sinVal * 500; 
+	 printf("tone: %f.\n", toneVal);
+//         gpioSetPWMfrequency(buzzerPin, toneVal);
+         time_sleep(0.01);
+     }
 }
 
 void stopAlertor(int pin) {
