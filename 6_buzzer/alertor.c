@@ -20,9 +20,12 @@ void alertor(int pin) {
     int x;
     double sinVal, toneVal;
 
-//	gpioPWM(buzzerPin, 128);
+	// gpioPWM(buzzerPin, 128);
 	
      for (x = 0; x < 360; x++) {
+	     if (signal_received) {
+		     break;
+	     }
          sinVal = sin(x * (M_PI / 180));
          toneVal = 2000 + sinVal * 500; 
 	 printf("tone: %f.\n", toneVal);
