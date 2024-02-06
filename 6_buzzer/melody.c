@@ -18,26 +18,26 @@ void sigint_handler(int signal) {
 
 // Define a structure for musical notes
 typedef struct {
-    int frequency; // Frequency of the note in Hz
-    int duration;  // Duration of the note in milliseconds
+	int frequency; // Frequency of the note in Hz
+	int duration;  // Duration of the note in milliseconds
 } Note;
 
 void alertor(int pin) {
-    int x;
-    double sinVal, toneVal;
+	int x;
+	double sinVal, toneVal;
 
-	 gpioPWM(buzzerPin, 128);
-	
-     for (x = 0; x < 720; x++) {
-	     if (signal_received) {
-		     break;
-	     }
-         sinVal = sin(x * (M_PI / 180));
-         toneVal = 2000 + sinVal * 500; 
-	 printf("tone: %f.\n", toneVal);
-         gpioSetPWMfrequency(buzzerPin, toneVal);
-         time_sleep(0.01);
-     }
+	gpioPWM(buzzerPin, 128);
+
+	for (x = 0; x < 720; x++) {
+		if (signal_received) {
+			break;
+		}
+		sinVal = sin(x * (M_PI / 180));
+		toneVal = 2000 + sinVal * 500; 
+		printf("tone: %f.\n", toneVal);
+		gpioSetPWMfrequency(buzzerPin, toneVal);
+		time_sleep(0.01);
+	}
 }
 
 void stopAlertor(int pin) {
@@ -57,21 +57,34 @@ int main() {
 	gpioSetPullUpDown(buttonPin, PI_PUD_UP);
 
 	while (!signal_received) {
-	    // Define a simple melody (C major scale upwards)
-	    Note melody[] = {
-		{262, 500}, // C4
-		{294, 500}, // D4
-		{330, 500}, // E4
-		{349, 500}, // F4
-		{392, 500}, // G4
-		{440, 500}, // A4
-		{494, 500}, // B4
-		{523, 500}  // C5
-	    };
-	    int notes = sizeof(melody) / sizeof(Note);
-
-	    
+		// Define a simple melody (C major scale upwards)
+		Note melody[] = {
+			{262, 500}, // C4
+			{294, 500}, // D4
+			{330, 500}, // E4
+			{349, 500}, // F4
+			{392, 500}, // G4
+			{440, 500}, // A4
+			{494, 500}, // B4
+			{523, 500}  // C5
+		};
+		int notes = sizeof(melody) / sizeof(Note);
+		for (int i = 0; i < notes; i++) {
+			if (signal_received) {
+				break;
+			}
+			// Set the PWM frequency to the current note
+			gpioSetPWMfrequency(buzzerPin, melody[i].frequency);
+			// Start the PWM with 50% duty cycle
+			gpioPWM(buzzerPin, 128);
+			// Wait for the duration of the note
+			gpioSleep(PI_TIME_RELATIVE, 0, melody[i].duration * 1000);
+			// Stop the PWM for a short period between notes
+			gpioPWM(buzzerPin, 0);
+			gpioSleep(PI_TIME_RELATIVE, 0, 100000);
+		}
 	}
+
 
 	gpioTerminate();
 	printf("\n");
